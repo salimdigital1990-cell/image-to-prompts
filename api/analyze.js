@@ -4,32 +4,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = await req.json();
-    const imageBase64 = body.image;
-
-    const response = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "pplx-vision",
-        messages: [
-          {
-            role: "system",
-            content: "Analyze the image and generate 4 creative prompts."
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Generate 4 image prompts based on this image." },
-              { type: "image_base64", image_base64: imageBase64 }
-            ]
-          }
-        ]
-      })
-    });
+    const response = await fetch(
+      "https://api.perplexity.ai/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "sonar-pro",
+          messages: [
+            {
+              role: "system",
+              content: "You generate creative image prompts."
+            },
+            {
+              role: "user",
+              content: "Generate 4 creative image prompts based on a single theme."
+            }
+          ]
+        })
+      }
+    );
 
     const data = await response.json();
     const text = data.choices[0].message.content;
@@ -42,6 +39,6 @@ export default async function handler(req, res) {
     res.status(200).json({ prompts });
 
   } catch (e) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: e.message });
   }
 }
